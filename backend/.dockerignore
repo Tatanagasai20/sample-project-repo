@@ -1,0 +1,37 @@
+# Maven build files
+target/
+!target/*.jar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Application properties for local development
+src/main/resources/application-dev.properties
+src/main/resources/application-local.properties
+
+# Git files
+.git/
+.gitignore
+
+# Docker files
+Dockerfile*
+.dockerignore
+
+# Documentation
+README.md
+DOCKER_README.md
