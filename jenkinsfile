@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Tatanagasai20/sample-project-repo.git'
+            }
+        }
+
+        stage('Copy to Remote') {
+            steps {
+                sh '''
+                    scp -i /var/lib/jenkins/.ssh/sai.pem -o StrictHostKeyChecking=no -r frontend ubuntu@172.31.11.112:/home/ubuntu/
+                '''
+            }
+        }
+
+        stage('Docker Build on Remote') {
+            steps {
+                sh '''
+                    ssh -i /var/lib/jenkins/.ssh/sai.pem -o StrictHostKeyChecking=no ubuntu@172.31.11.112 \
+                    "cd /home/ubuntu/frontend && docker build -t front ."
+                '''
+            }
+        }
+
+        stage('Run Container on Remote') {
+            steps {
+                sh '''
+                    ssh -i /var/lib/jenkins/.ssh/sai.pem -o StrictHostKeyChecking=no ubuntu@172.31.11.112 \
+                    "docker stop frontend-app || true && docker rm frontend-app || true && docker run -d -p 80:80 --name frontend-app front"
+                '''
+            }
+        }
+
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+    }
+}
