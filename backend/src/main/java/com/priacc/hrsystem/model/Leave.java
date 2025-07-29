@@ -40,6 +40,8 @@ public class Leave {
     @NotNull
     private LocalDate endDate;
 
+    private int numberOfDays;
+
     @NotBlank
     @Size(max = 500)
     private String reason;
@@ -77,7 +79,8 @@ public class Leave {
         PENDING,
         APPROVED,
         REJECTED,
-        CANCELLED
+        CANCELLED,
+        TAKEN
     }
 
     public Leave(Employee employee, LeaveType leaveType, LocalDate startDate, 

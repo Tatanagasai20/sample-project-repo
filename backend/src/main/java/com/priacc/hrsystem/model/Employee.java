@@ -43,9 +43,26 @@ public class Employee {
     @JsonIgnore
     private User user;
 
+    // Additional fields that are referenced in DTOs and services
+    @NotBlank
+    @Size(max = 50)
+    private String firstName;
+
+    @NotBlank
+    @Size(max = 50)
+    private String lastName;
+
+    @NotBlank
+    @Size(max = 100)
+    @Email
+    private String email;
+
     @NotBlank
     @Size(max = 50)
     private String phone;
+
+    @Size(max = 20)
+    private String mobilePhone;
 
     @NotNull
     private LocalDate dateOfBirth;
@@ -54,7 +71,14 @@ public class Employee {
     @Size(max = 10)
     private String gender;
 
-    @Embedded
+    @Size(max = 20)
+    private String maritalStatus;
+
+    @Size(max = 50)
+    private String nationality;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
     private Address address;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -77,6 +101,9 @@ public class Employee {
     @Size(max = 20)
     private String employmentType;
 
+    @Size(max = 20)
+    private String employeeType;
+
     @NotNull
     private LocalDate joinDate;
 
@@ -86,10 +113,12 @@ public class Employee {
     @Size(max = 20)
     private String status;
 
-    @Embedded
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "salary_id")
     private Salary salary;
 
-    @Embedded
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "bank_details_id")
     private BankDetails bankDetails;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -120,32 +149,6 @@ public class Employee {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-    @Embeddable
-    @Data
-    public static class Address {
-        private String street;
-        private String city;
-        private String state;
-        private String zipCode;
-        private String country;
-    }
-
-    @Embeddable
-    @Data
-    public static class Salary {
-        private BigDecimal amount;
-        private String currency;
-        private LocalDate effectiveDate;
-    }
-
-    @Embeddable
-    @Data
-    public static class BankDetails {
-        private String bankName;
-        private String accountNumber;
-        private String ifscCode;
-    }
 
     @Embeddable
     @Data
