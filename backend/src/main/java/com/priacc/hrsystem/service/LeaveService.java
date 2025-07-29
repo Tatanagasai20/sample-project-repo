@@ -70,6 +70,12 @@ public class LeaveService {
     public List<Leave> getLeavesByStatus(Leave.LeaveStatus status) {
         return leaveRepository.findByStatus(status);
     }
+    
+    // Overloaded method for String status
+    public List<Leave> getLeavesByStatus(String status) {
+        Leave.LeaveStatus leaveStatus = Leave.LeaveStatus.valueOf(status.toUpperCase());
+        return getLeavesByStatus(leaveStatus);
+    }
 
     public List<Leave> getLeavesByDateRange(LocalDate startDate, LocalDate endDate) {
         return leaveRepository.findByDateRange(startDate, endDate);
@@ -84,6 +90,12 @@ public class LeaveService {
 
     public List<Leave> getLeavesByDepartmentAndStatus(Long departmentId, Leave.LeaveStatus status) {
         return leaveRepository.findByDepartmentAndStatus(departmentId, status);
+    }
+    
+    // Overloaded method for String status
+    public List<Leave> getLeavesByDepartmentAndStatus(Long departmentId, String status) {
+        Leave.LeaveStatus leaveStatus = Leave.LeaveStatus.valueOf(status.toUpperCase());
+        return getLeavesByDepartmentAndStatus(departmentId, leaveStatus);
     }
 
     @Transactional
@@ -164,7 +176,7 @@ public class LeaveService {
     }
 
     @Transactional
-    public Leave approveLeave(Long id, String comments) {
+    public Leave approveLeave(Long id, Long approverId, String comments) {
         Leave leave = getLeaveById(id);
         
         // Only allow approval if leave is pending
@@ -172,14 +184,12 @@ public class LeaveService {
             throw new IllegalStateException("Cannot approve leave that is not in PENDING status");
         }
         
-        // Get current user for approval info
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-        User approver = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentUserEmail));
+        // Get approver by ID
+        Employee approver = employeeRepository.findById(approverId)
+                .orElseThrow(() -> new ResourceNotFoundException("Approver not found with id: " + approverId));
         
         leave.setStatus(Leave.LeaveStatus.APPROVED);
-        leave.setApprovedBy(approver.getEmployee());
+        leave.setApprovedBy(approver);
         leave.setApprovedAt(LocalDateTime.now());
         leave.setComments(comments);
         leave.setUpdatedAt(LocalDateTime.now());
@@ -188,7 +198,7 @@ public class LeaveService {
     }
 
     @Transactional
-    public Leave rejectLeave(Long id, String comments) {
+    public Leave rejectLeave(Long id, Long approverId, String comments) {
         Leave leave = getLeaveById(id);
         
         // Only allow rejection if leave is pending
@@ -196,14 +206,12 @@ public class LeaveService {
             throw new IllegalStateException("Cannot reject leave that is not in PENDING status");
         }
         
-        // Get current user for rejection info
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-        User rejector = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentUserEmail));
+        // Get approver by ID
+        Employee approver = employeeRepository.findById(approverId)
+                .orElseThrow(() -> new ResourceNotFoundException("Approver not found with id: " + approverId));
         
         leave.setStatus(Leave.LeaveStatus.REJECTED);
-        leave.setApprovedBy(rejector.getEmployee()); // Using the same field for the person who rejected
+        leave.setApprovedBy(approver);
         leave.setApprovedAt(LocalDateTime.now());
         leave.setComments(comments);
         leave.setUpdatedAt(LocalDateTime.now());

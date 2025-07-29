@@ -247,7 +247,7 @@ public class EmployeeService {
     }
 
     public List<Employee> getEmployeesByJoinDateRange(LocalDate startDate, LocalDate endDate) {
-        return employeeRepository.findByJoinDateBetween(startDate, endDate);
+        return employeeRepository.findByHireDateBetween(startDate, endDate);
     }
 
     public List<Employee> getEmployeesByStatus(String status) {

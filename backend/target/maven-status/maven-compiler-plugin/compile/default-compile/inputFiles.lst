@@ -2,6 +2,7 @@
 /workspace/backend/src/main/java/com/priacc/hrsystem/repository/DepartmentRepository.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/exception/ResourceNotFoundException.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/model/Education.java
+/workspace/backend/src/main/java/com/priacc/hrsystem/controller/SimpleDepartmentController.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/model/Employee.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/dto/LeaveDto.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/model/Position.java
@@ -25,10 +26,12 @@
 /workspace/backend/src/main/java/com/priacc/hrsystem/model/BankDetails.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/HrSystemApplication.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/controller/DepartmentController.java
+/workspace/backend/src/main/java/com/priacc/hrsystem/controller/TestController.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/controller/LeaveController.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/repository/UserRepository.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/dto/LoginRequest.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/model/Document.java
+/workspace/backend/src/main/java/com/priacc/hrsystem/controller/SimpleEmployeeController.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/controller/PositionController.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/model/Address.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/repository/PositionRepository.java

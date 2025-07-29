@@ -27,9 +27,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query("SELECT e FROM Employee e WHERE e.status = :status")
     List<Employee> findByStatus(String status);
     
-    @Query("SELECT e FROM Employee e WHERE e.joinDate BETWEEN :startDate AND :endDate")
-    List<Employee> findByJoinDateBetween(LocalDate startDate, LocalDate endDate);
+    @Query("SELECT e FROM Employee e WHERE e.hireDate BETWEEN :startDate AND :endDate")
+    List<Employee> findByHireDateBetween(LocalDate startDate, LocalDate endDate);
     
-    @Query("SELECT e FROM Employee e WHERE LOWER(e.user.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(e.user.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(e.employeeId) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    @Query("SELECT e FROM Employee e WHERE LOWER(e.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(e.employeeId) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Employee> searchEmployees(String keyword, Pageable pageable);
+    
+    @Query("SELECT e FROM Employee e WHERE LOWER(e.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(e.employeeId) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Employee> searchByKeyword(String keyword);
 }
