@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres-hr:
+    image: postgres:16-alpine
+    container_name: hr_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: priacc_hr_system
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgresql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./postgresql/data.sql:/docker-entrypoint-initdb.d/2-data.sql
+    networks:
+      - hr_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d priacc_hr_system"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MySQL Database
+  mysql-hr:
+    image: mysql:8.0
+    container_name: hr_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: priacc_hr_system
+      MYSQL_USER: hruser
+      MYSQL_PASSWORD: hrpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./mysql/data.sql:/docker-entrypoint-initdb.d/2-data.sql
+    networks:
+      - hr_network
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # pgAdmin for PostgreSQL management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: hr_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@priacc.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8081:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - hr_network
+    depends_on:
+      - postgres-hr
+
+  # phpMyAdmin for MySQL management
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: hr_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql-hr
+      PMA_PORT: 3306
+      PMA_USER: hruser
+      PMA_PASSWORD: hrpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8082:80"
+    networks:
+      - hr_network
+    depends_on:
+      - mysql-hr
+
+  # Redis for caching (optional)
+  redis-hr:
+    image: redis:7-alpine
+    container_name: hr_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - hr_network
+    command: redis-server --appendonly yes
+
+  # Redis Commander for Redis management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: hr_redis_commander
+    restart: unless-stopped
+    environment:
+      REDIS_HOSTS: local:redis-hr:6379
+    ports:
+      - "8083:8081"
+    networks:
+      - hr_network
+    depends_on:
+      - redis-hr
+
+volumes:
+  postgres_data:
+    driver: local
+  mysql_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  hr_network:
+    driver: bridge
