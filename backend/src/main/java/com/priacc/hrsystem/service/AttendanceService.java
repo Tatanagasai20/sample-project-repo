@@ -30,6 +30,16 @@ public class AttendanceService {
     public List<Attendance> getAllAttendances() {
         return attendanceRepository.findAll();
     }
+    
+    // Missing method for controller
+    public List<Attendance> getAllAttendance() {
+        return attendanceRepository.findAll();
+    }
+    
+    // Missing method for controller
+    public Page<Attendance> getAllAttendance(Pageable pageable) {
+        return attendanceRepository.findAll(pageable);
+    }
 
     public Page<Attendance> getAllAttendances(Pageable pageable) {
         return attendanceRepository.findAll(pageable);
@@ -38,13 +48,6 @@ public class AttendanceService {
     public Attendance getAttendanceById(Long id) {
         return attendanceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance not found with id: " + id));
-    }
-
-    public Optional<Attendance> getAttendanceByEmployeeAndDate(Long employeeId, LocalDate date) {
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + employeeId));
-        
-        return attendanceRepository.findByEmployeeAndDate(employee, date);
     }
 
     public List<Attendance> getAttendancesByEmployee(Long employeeId) {
@@ -78,6 +81,42 @@ public class AttendanceService {
 
     public List<Attendance> getAttendancesByDepartmentAndDateRange(Long departmentId, LocalDate startDate, LocalDate endDate) {
         return attendanceRepository.findByDepartmentAndDateBetween(departmentId, startDate, endDate);
+    }
+    
+    // Alternative method names for controller compatibility
+    public List<Attendance> getAttendanceByEmployee(Long employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + employeeId));
+        return attendanceRepository.findByEmployee(employee);
+    }
+    
+    public List<Attendance> getAttendanceByEmployeeAndDateRange(Long employeeId, LocalDate startDate, LocalDate endDate) {
+        return getAttendancesByEmployeeAndDateRange(employeeId, startDate, endDate);
+    }
+    
+    public List<Attendance> getAttendanceByDateRange(LocalDate startDate, LocalDate endDate) {
+        return getAttendancesByDateRange(startDate, endDate);
+    }
+    
+    public List<Attendance> getAttendanceByDepartmentAndDate(Long departmentId, LocalDate date) {
+        return getAttendancesByDepartmentAndDate(departmentId, date);
+    }
+    
+    public List<Attendance> getAttendanceByDepartmentAndDateRange(Long departmentId, LocalDate startDate, LocalDate endDate) {
+        return getAttendancesByDepartmentAndDateRange(departmentId, startDate, endDate);
+    }
+    
+    public long countAttendanceByEmployeeAndStatusAndDateRange(Long employeeId, String status, LocalDate startDate, LocalDate endDate) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + employeeId));
+        return attendanceRepository.countByEmployeeAndStatusAndDateBetween(employee, Attendance.AttendanceStatus.valueOf(status.toUpperCase()), startDate, endDate);
+    }
+    
+    public Attendance getAttendanceByEmployeeAndDate(Long employeeId, LocalDate date) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + employeeId));
+        return attendanceRepository.findByEmployeeAndDate(employee, date)
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance not found for employee " + employeeId + " on date " + date));
     }
 
     @Transactional
@@ -140,30 +179,56 @@ public class AttendanceService {
             throw new IllegalStateException("Employee has not checked in today");
         }
         
-        // Update record with check-out information
-        LocalTime checkOutTime = LocalTime.now();
-        attendance.setCheckOutTime(checkOutTime);
+        // Update attendance record with check-out information
+        attendance.setCheckOutTime(LocalTime.now());
         attendance.setIpAddress(attendanceDto.getIpAddress());
         attendance.setLocation(attendanceDto.getLocation());
         
         // Calculate work hours
-        Duration workDuration = Duration.between(attendance.getCheckInTime(), checkOutTime);
-        
-        // Subtract break time if recorded
+        long workMinutes = Duration.between(attendance.getCheckInTime(), attendance.getCheckOutTime()).toMinutes();
         if (attendance.getBreakStartTime() != null && attendance.getBreakEndTime() != null) {
-            Duration breakDuration = Duration.between(attendance.getBreakStartTime(), attendance.getBreakEndTime());
-            workDuration = workDuration.minus(breakDuration);
+            long breakMinutes = Duration.between(attendance.getBreakStartTime(), attendance.getBreakEndTime()).toMinutes();
+            workMinutes -= breakMinutes;
+        }
+        double workHours = workMinutes / 60.0;
+        attendance.setWorkHours(workHours);
+        
+        return attendanceRepository.save(attendance);
+    }
+    
+    // Overloaded method for controller compatibility
+    @Transactional
+    public Attendance checkOut(Long attendanceId, AttendanceDto attendanceDto) {
+        Attendance attendance = attendanceRepository.findById(attendanceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance not found with id: " + attendanceId));
+        
+        // If already checked out, throw exception
+        if (attendance.getCheckOutTime() != null) {
+            throw new IllegalStateException("Employee has already checked out today");
         }
         
-        // Convert to hours and minutes
-        long totalMinutes = workDuration.toMinutes();
-        double hours = totalMinutes / 60.0;
-        attendance.setWorkHours(hours);
-        
-        // Add notes if provided
-        if (attendanceDto.getNotes() != null) {
-            attendance.setNotes(attendanceDto.getNotes());
+        // If not checked in, throw exception
+        if (attendance.getCheckInTime() == null) {
+            throw new IllegalStateException("Employee has not checked in today");
         }
+        
+        // Update attendance record with check-out information
+        attendance.setCheckOutTime(LocalTime.now());
+        if (attendanceDto.getIpAddress() != null) {
+            attendance.setIpAddress(attendanceDto.getIpAddress());
+        }
+        if (attendanceDto.getLocation() != null) {
+            attendance.setLocation(attendanceDto.getLocation());
+        }
+        
+        // Calculate work hours
+        long workMinutes = Duration.between(attendance.getCheckInTime(), attendance.getCheckOutTime()).toMinutes();
+        if (attendance.getBreakStartTime() != null && attendance.getBreakEndTime() != null) {
+            long breakMinutes = Duration.between(attendance.getBreakStartTime(), attendance.getBreakEndTime()).toMinutes();
+            workMinutes -= breakMinutes;
+        }
+        double workHours = workMinutes / 60.0;
+        attendance.setWorkHours(workHours);
         
         return attendanceRepository.save(attendance);
     }

@@ -50,6 +50,21 @@ public class Position {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    // Custom getter for backward compatibility
+    public boolean isManagementPosition() {
+        return isManagement;
+    }
+    
+    // Custom setter for backward compatibility
+    public void setIsManagementPosition(boolean isManagementPosition) {
+        this.isManagement = isManagementPosition;
+    }
+    
+    // Getter method for isManagementPosition
+    public boolean getIsManagementPosition() {
+        return isManagement;
+    }
+
     public Position(String title, String description, Department department, boolean isManagement) {
         this.title = title;
         this.description = description;

@@ -39,6 +39,8 @@ public class Attendance {
 
     private LocalTime breakEndTime;
 
+    private double workHours;
+
     @Enumerated(EnumType.STRING)
     private AttendanceStatus status;
 
