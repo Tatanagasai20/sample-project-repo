@@ -1,5 +1,5 @@
 -- Insert Departments
-INSERT INTO departments (id, name, description, created_date, last_modified_date) VALUES 
+INSERT INTO departments (id, name, description, created_at, updated_at) VALUES 
 (1, 'Information Technology', 'IT Department handling all technology-related operations', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (2, 'Human Resources', 'HR Department managing employee relations and policies', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (3, 'Finance', 'Finance Department handling financial operations', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -7,7 +7,7 @@ INSERT INTO departments (id, name, description, created_date, last_modified_date
 (5, 'Operations', 'Operations Department managing daily business operations', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert Positions
-INSERT INTO positions (id, title, description, department_id, is_management, created_date, last_modified_date) VALUES 
+INSERT INTO positions (id, title, description, department_id, is_management, created_at, updated_at) VALUES 
 (1, 'Software Developer', 'Develops and maintains software applications', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (2, 'Senior Software Developer', 'Senior developer with team leadership responsibilities', 1, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (3, 'HR Manager', 'Manages HR operations and employee relations', 2, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
