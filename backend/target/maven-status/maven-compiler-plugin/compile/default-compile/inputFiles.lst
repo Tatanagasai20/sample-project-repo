@@ -48,7 +48,6 @@
 /workspace/backend/src/main/java/com/priacc/hrsystem/config/SecurityConfig.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/exception/GlobalExceptionHandler.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/repository/LeaveRepository.java
-/workspace/backend/src/main/java/com/priacc/hrsystem/security/SecurityConfig.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/dto/AuthResponse.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/security/UserSecurity.java
 /workspace/backend/src/main/java/com/priacc/hrsystem/config/WebConfig.java

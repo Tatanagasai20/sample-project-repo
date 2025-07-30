@@ -31,7 +31,6 @@ com/priacc/hrsystem/dto/LeaveDto.class
 com/priacc/hrsystem/model/BankDetails.class
 com/priacc/hrsystem/model/Salary.class
 com/priacc/hrsystem/model/Attendance$AttendanceStatus.class
-com/priacc/hrsystem/security/SecurityConfig.class
 com/priacc/hrsystem/model/Document.class
 com/priacc/hrsystem/security/JwtAuthenticationEntryPoint.class
 com/priacc/hrsystem/repository/DepartmentRepository.class

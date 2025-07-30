@@ -153,9 +153,16 @@ public class Employee {
     @Embeddable
     @Data
     public static class EmergencyContact {
+        @Column(name = "emergency_contact_name")
         private String name;
+        
+        @Column(name = "emergency_contact_relationship")
         private String relationship;
+        
+        @Column(name = "emergency_contact_phone")
         private String phone;
+        
+        @Column(name = "emergency_contact_email")
         private String email;
     }
 }
